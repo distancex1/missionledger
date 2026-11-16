@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mission Ledger — Nonprofit Accounting &amp; Grant Tracking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    color-scheme: only light;
+    --paper: #F6F4EC; --paper-2: #EDEBDF; --card: #FBFAF4;
+    --ink: #202B24; --ink-2: #4A574E;
+    --pine: #1E4D38; --pine-deep: #123227;
+    --brass: #7A5F20; --brass-bright: #C9A55C; --madder: #9C4433;
+    --rule: rgba(30, 77, 56, 0.16);
+    --serif: "Fraunces", Constantia, "Palatino Linotype", Georgia, serif;
+    --sans: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", Consolas, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 1.0625rem; line-height: 1.65; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 380; line-height: 1.06; text-wrap: balance; letter-spacing: -0.02em; }
+  em { font-style: italic; }
+  a { color: var(--pine); }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
+  ::selection { background: var(--pine); color: var(--paper); }
+  .wrap { max-width: 1180px; margin: 0 auto; padding-inline: 24px; }
+  .skip-link { position: absolute; left: -9999px; top: 0; background: var(--pine-deep); color: var(--paper); padding: 12px 20px; z-index: 20; font-weight: 600; text-decoration: none; }
+  .skip-link:focus { left: 0; }
+  .eyebrow { font-family: var(--mono); font-size: 0.74rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass); }
+
+  header { border-bottom: 1px solid var(--rule); }
+  .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-block: 18px; }
+  .brand { font-family: var(--serif); font-size: 1.45rem; color: var(--ink); text-decoration: none; }
+  .brand em { color: var(--pine); }
+  nav { display: flex; gap: 28px; align-items: center; }
+  nav a { text-decoration: none; color: var(--ink-2); font-size: 0.95rem; }
+  nav a:hover { color: var(--pine); }
+  nav a.nav-cta { background: var(--pine); color: var(--paper); padding: 10px 20px; font-weight: 600; }
+  nav a.nav-cta:hover { background: var(--pine-deep); }
+
+  /* hero */
+  .hero { text-align: center; padding: 84px 0 0; position: relative;
+    background: repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(30, 77, 56, 0.1) 31px, rgba(30, 77, 56, 0.1) 32px) var(--paper); }
+  .hero h1 { font-size: clamp(2.7rem, 7.4vw, 6.4rem); line-height: 1; max-width: 13ch; margin: 22px auto 28px; }
+  .hero h1 em { color: var(--pine); }
+  .hero h1 .ln { display: block; position: relative; overflow: hidden; padding-bottom: 0.14em; margin-bottom: -0.14em; }
+  .hero h1 .ln > span { display: inline-block; background: var(--paper); padding: 0 0.16em; animation: up 0.9s cubic-bezier(.2,.8,.2,1) both; }
+  .hero h1 .ln:nth-child(1) { z-index: 4; } .hero h1 .ln:nth-child(2) { z-index: 3; } .hero h1 .ln:nth-child(3) { z-index: 2; }
+  .hero h1 .ln:nth-child(2) > span { animation-delay: 0.1s; } .hero h1 .ln:nth-child(3) > span { animation-delay: 0.2s; } .hero h1 .ln:nth-child(4) > span { animation-delay: 0.3s; }
+  @keyframes up { from { transform: translateY(110%); } to { transform: none; } }
+  .hero .eyebrow span, .lede span { background: var(--paper); padding: 2px 8px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .lede { max-width: 58ch; margin: 0 auto 34px; font-size: 1.14rem; color: var(--ink-2); line-height: 1.9; }
+  .cta-row { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; align-items: center; }
+  .btn { display: inline-block; background: var(--pine); color: var(--paper); text-decoration: none; font-weight: 600; padding: 15px 30px; border: 1px solid var(--pine); box-shadow: 4px 4px 0 var(--brass-bright); transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease; }
+  .btn:hover { background: var(--pine-deep); transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--brass-bright); }
+  .btn-ghost { color: var(--pine); text-decoration: none; font-weight: 600; padding: 12px 4px; border-bottom: 2px solid rgba(30, 77, 56, 0.35); background: var(--paper); }
+  .btn-ghost:hover { border-color: var(--pine); }
+
+  /* the packet */
+  .packet-label { margin-top: 70px; }
+  .packet { position: relative; height: 810px; max-width: 1100px; margin: 26px auto 0; }
+  .page {
+    position: absolute; left: 50%; top: 0; width: 400px; margin-left: -200px; text-align: left; cursor: pointer;
+    appearance: none; font: inherit; color: inherit;
+    background: var(--card); border: 1px solid rgba(30, 77, 56, 0.3); padding: 22px 22px 20px;
+    box-shadow: 0 2px 3px rgba(18, 50, 39, 0.08), 0 34px 60px -30px rgba(18, 50, 39, 0.5);
+    font-family: var(--mono); font-size: 0.76rem; line-height: 1.5;
+    transition: transform 0.6s cubic-bezier(.2,.8,.2,1), box-shadow 0.3s ease; transform: translate(var(--x, 0), var(--y, 0)) rotate(var(--r, 0deg)); z-index: 1;
+    animation: deal 1s cubic-bezier(.2,.8,.2,1) both;
+  }
+  @keyframes deal { from { opacity: 0; transform: translate(0, 60px) rotate(0deg); } }
+  .page[data-pos="left"] { --x: -384px; --r: -5deg; }
+  .page[data-pos="right"] { --x: 384px; --r: 5deg; }
+  .page.page[data-pos="front"] { z-index: 3; --y: 0px; box-shadow: 0 2px 3px rgba(18, 50, 39, 0.1), 0 44px 70px -30px rgba(18, 50, 39, 0.6); cursor: default; }
+  .page.page:not([data-pos="front"]):hover { --y: 46px; }
+  .page h3 { font-size: 1.2rem; font-weight: 500; letter-spacing: -0.01em; }
+  .page .meta { color: var(--ink-2); font-size: 0.64rem; letter-spacing: 0.1em; text-transform: uppercase; padding-bottom: 10px; margin-bottom: 4px; border-bottom: 2px solid var(--pine); display: block; }
+  .page table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  .page th { font-weight: 400; color: var(--ink-2); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; text-align: right; padding: 7px 0 5px; }
+  .page th:first-child, .page td:first-child { text-align: left; }
+  .page td { padding: 6px 0; border-top: 1px solid var(--rule); text-align: right; white-space: nowrap; }
+  .page td:first-child { white-space: normal; padding-right: 8px; }
+  .page tr.sub td { color: var(--ink-2); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; border-top: 0; padding-top: 12px; }
+  .page tr.tot td { border-top: 3px double var(--pine); font-weight: 500; color: var(--ink); }
+  .page .neg { color: var(--madder); } .page .pos { color: var(--pine); }
+  .page.feature { width: 500px; margin-left: -250px; }
+  .page[data-pos="left"], .page[data-pos="right"] { --y: 30px; }
+  /* QuickBooks-style report tables: indented account hierarchy, rules only above totals */
+  .page table.qb { font-size: 0.68rem; line-height: 1.35; table-layout: fixed; }
+  .qb th { width: 74px; } .qb th:first-child { width: auto; }
+  .page .qb td, .page .qb tr.tot td, .page .qb tr.sub td { border-top: 0; padding: 2.5px 0; }
+  .qb th { padding: 6px 0 6px 8px; white-space: normal; vertical-align: bottom; line-height: 1.3; border-bottom: 1px solid var(--pine); }
+  .page .qb td + td { padding-left: 8px; }
+  .qb tr.l1 td:first-child { padding-left: 12px; } .qb tr.l2 td:first-child { padding-left: 24px; } .qb tr.l3 td:first-child { padding-left: 36px; }
+  .page .qb tr.sec td { font-weight: 500; color: var(--ink); padding-top: 9px; }
+  .qb tr.tot td { font-weight: 500; color: var(--ink); }
+  .page .qb tr.tot td + td { border-top: 1px solid rgba(32, 43, 36, 0.55); }
+  .page .qb tr.grand td { font-weight: 500; color: var(--ink); padding-top: 4px; }
+  .page .qb tr.grand td + td { border-top: 1px solid rgba(32, 43, 36, 0.55); border-bottom: 3px double var(--pine); }
+  .page .soa th { width: 66px; font-size: 0.56rem; letter-spacing: 0.02em; padding-left: 4px; } .page .soa th:first-child { width: auto; }
+  .key { display: inline-block; width: 9px; height: 9px; margin-right: 6px; }
+  .k1 { background: var(--pine); } .k2 { background: var(--brass-bright); } .k3 { background: var(--madder); }
+  .split { display: flex; gap: 2px; height: 10px; margin-top: 14px; }
+  .split i { display: block; height: 100%; }
+  .split-legend b { font-weight: 400; white-space: nowrap; margin-right: 10px; }
+  .split-legend { display: block; margin-top: 7px; font-size: 0.62rem; letter-spacing: 0.02em; color: var(--ink-2); line-height: 1.6; }
+  .page .flag { display: inline-block; font-size: 0.56rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--madder); border: 1px solid var(--madder); padding: 0 4px; margin-left: 4px; vertical-align: 1px; }
+  .packet-note { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.08em; color: var(--ink-2); padding: 14px 0 26px; }
+  .packet-note span { background: var(--paper); padding: 2px 8px; }
+
+  .trust { background: var(--pine-deep); color: var(--paper); }
+  .trust-inner { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .trust-item { padding: 28px 22px; border-left: 1px solid rgba(246, 244, 236, 0.16); font-size: 0.92rem; color: #C6D4C8; }
+  .trust-item:first-child { border-left: none; padding-left: 0; }
+  .trust-item strong { display: block; font-family: var(--serif); font-weight: 400; font-size: 1.7rem; color: var(--paper); line-height: 1.2; }
+
+  section { padding: 110px 0; }
+  .section-head { max-width: 760px; margin-bottom: 50px; }
+  .section-head h2, .big-h { font-size: clamp(2.2rem, 5vw, 4.2rem); margin: 16px 0 18px; }
+  .section-head h2 em, .big-h em { color: var(--pine); }
+  .section-head p { color: var(--ink-2); max-width: 58ch; }
+
+  /* sound familiar */
+  .familiar { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 70px; align-items: start; }
+  .familiar .big-h { position: sticky; top: 40px; }
+  .notes { list-style: none; border-top: 2px solid var(--pine); }
+  .notes li { display: grid; grid-template-columns: 34px 1fr; gap: 16px; padding: 24px 0; border-bottom: 1px solid rgba(30, 77, 56, 0.28); font-family: var(--serif); font-size: clamp(1.3rem, 2.3vw, 1.75rem); line-height: 1.25; }
+  .notes .x { width: 26px; height: 26px; border: 1.5px solid var(--madder); margin-top: 5px; position: relative; }
+  .notes .x svg { position: absolute; inset: -5px -7px -3px -2px; overflow: visible; }
+  .notes .x path { fill: none; stroke: var(--madder); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 44; stroke-dashoffset: 0; }
+  .js .notes .x path { stroke-dashoffset: 44; transition: stroke-dashoffset 0.5s ease-out 0.25s; }
+  .js .notes li.in .x path { stroke-dashoffset: 0; }
+  .notes-end { margin-top: 26px; color: var(--ink-2); }
+  .notes-end strong { color: var(--pine); }
+
+  /* services */
+  .services { background: var(--paper-2); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .lines { border-top: 2px solid var(--pine); }
+  .line { display: grid; grid-template-columns: 90px minmax(0, 0.9fr) minmax(0, 1.3fr); gap: 24px; align-items: baseline; padding: 28px 12px; border-bottom: 1px solid rgba(30, 77, 56, 0.28); position: relative; transition: background-color 0.25s ease, padding 0.25s ease; }
+  .line::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--madder); transform: scaleY(0); transform-origin: top; transition: transform 0.3s ease; }
+  .line:hover { background: var(--card); padding-left: 22px; }
+  .line:hover::before { transform: scaleY(1); }
+  .line .no { font-family: var(--serif); font-style: italic; font-size: 3rem; line-height: 0.8; color: transparent; -webkit-text-stroke: 1px var(--pine); transition: color 0.3s; }
+  .line:hover .no { color: var(--pine); }
+  .line h3 { font-size: 1.6rem; }
+  .line p { color: var(--ink-2); font-size: 0.98rem; }
+
+  /* why */
+  .why { background: var(--pine-deep); color: var(--paper); position: relative; overflow: hidden; }
+  .why::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(246, 244, 236, 0.045) 31px, rgba(246, 244, 236, 0.045) 32px); pointer-events: none; }
+  .why .wrap { position: relative; }
+  .why .eyebrow, .contact .eyebrow { color: var(--brass-bright); }
+  .why h2 { font-size: clamp(2.4rem, 6.4vw, 5.6rem); margin: 16px 0 54px; max-width: 14ch; }
+  .why h2 em, .contact h2 em { color: var(--brass-bright); }
+  .why-cols { display: grid; grid-template-columns: 1.05fr 1fr; gap: 60px; align-items: start; }
+  .why-cols p { color: #C6D4C8; margin-bottom: 18px; max-width: 56ch; }
+  .why-cols p strong { color: var(--paper); font-weight: 600; }
+  .quiz { background: var(--paper); color: var(--ink); padding: 32px 30px 28px; transform: rotate(-1deg); box-shadow: 0 30px 60px -24px rgba(0, 0, 0, 0.55); }
+  .quiz h3 { font-size: 1.35rem; margin-bottom: 16px; }
+  .quiz ul { list-style: none; }
+  .quiz li { padding: 13px 0 13px 26px; border-top: 1px solid var(--rule); position: relative; }
+  .quiz li::before { content: "?"; position: absolute; left: 2px; font-family: var(--serif); font-style: italic; font-size: 1.3rem; line-height: 1.3; color: var(--madder); }
+  .quiz-note { margin-top: 16px; padding-top: 14px; border-top: 3px double var(--pine); font-family: var(--serif); font-style: italic; font-size: 1.1rem; color: var(--pine); }
+
+  /* about */
+  .about-cols { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr); gap: 80px; align-items: center; }
+  .about-text p { max-width: 60ch; color: var(--ink-2); margin-bottom: 16px; }
+  .about-text p.first { font-family: var(--serif); font-size: 1.5rem; line-height: 1.35; color: var(--ink); }
+  .portrait { background: var(--pine-deep); color: var(--paper); border-radius: 220px 220px 0 0; padding: 70px 30px 34px; text-align: center; box-shadow: 10px 10px 0 var(--brass-bright); }
+  .portrait .d { font-family: var(--serif); font-style: italic; font-size: 8.5rem; line-height: 0.8; color: var(--brass-bright); margin-bottom: 30px; }
+  .portrait p { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: #C6D4C8; margin-bottom: 18px; }
+  .portrait img { width: 170px; max-width: 100%; height: auto; }
+
+  /* process */
+  .process { background: var(--paper-2); border-top: 1px solid var(--rule); }
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
+  .step { border-top: 2px solid var(--pine); padding-top: 22px; }
+  .step .n { font-family: var(--serif); font-style: italic; font-size: 5rem; line-height: 0.9; color: var(--pine); margin-bottom: 18px; }
+  .step h3 { font-size: 1.6rem; margin-bottom: 10px; }
+  .step p { color: var(--ink-2); font-size: 0.98rem; }
+
+  .contact { background: var(--pine-deep); color: var(--paper); text-align: center; padding: 140px 0 120px; }
+  .contact h2 { font-size: clamp(2.8rem, 9vw, 8rem); line-height: 0.95; margin: 20px 0 26px; }
+  .contact p.sub { color: #C6D4C8; max-width: 50ch; margin: 0 auto 40px; }
+  .contact .btn { background: var(--paper); color: var(--pine-deep); border-color: var(--paper); font-size: 1.08rem; }
+  .contact .btn:hover { background: #fff; }
+  .contact .where { margin-top: 36px; font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: #C6D4C8; }
+  .site-footer { background: var(--pine-deep); color: #C6D4C8; border-top: 1px solid rgba(246, 244, 236, 0.15); padding: 26px 0; font-size: 0.88rem; }
+  .site-footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: center; }
+  .site-footer .brand { color: var(--paper); font-size: 1.15rem; }
+  .site-footer .brand em { color: var(--brass-bright); }
+
+  .js .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .js .reveal.in { opacity: 1; transform: none; }
+
+  @media (max-width: 1100px) {
+    .page[data-pos="left"] { --x: -24vw; } .page[data-pos="right"] { --x: 24vw; }
+  }
+  @media (max-width: 820px) {
+    .packet { height: auto; display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 6px 24px 30px; margin-inline: -24px; }
+    .page, .page[data-pos] { position: static; flex: 0 0 min(84vw, 380px); width: auto; margin: 0; transform: none; scroll-snap-align: center; align-self: flex-start; --y: 0px; cursor: default; animation: none; }
+    .page.feature { order: -1; flex-basis: min(92vw, 480px); }
+    .familiar, .why-cols, .about-cols { grid-template-columns: 1fr; gap: 36px; }
+    .familiar .big-h { position: static; }
+    .trust-inner { grid-template-columns: 1fr 1fr; }
+    .trust-item { border-left: none; border-top: 1px solid rgba(246, 244, 236, 0.16); padding: 18px 12px 18px 0; }
+    .trust-item:nth-child(-n+2) { border-top: none; }
+    .line { grid-template-columns: 56px 1fr; gap: 6px 14px; }
+    .line p { grid-column: 2; }
+    .steps { grid-template-columns: 1fr; }
+    .portrait { max-width: 300px; }
+    section { padding: 72px 0; }
+    .hero { padding-top: 56px; }
+    nav a:not(.nav-cta) { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0s !important; transition-duration: 0.01ms !important; transition-delay: 0s !important; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header>
+  <div class="wrap header-inner">
+    <a class="brand" href="#top">Mission <em>Ledger</em></a>
+    <nav aria-label="Main">
+      <a href="#services">Services</a>
+      <a href="#why">Why a specialist</a>
+      <a href="#about">About</a>
+      <a class="nav-cta" href="#contact">Get in touch</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<div class="hero" id="top">
+  <div class="wrap">
+    <p class="eyebrow"><span>Nonprofit accounting · Remote · Based in Detroit</span></p>
+    <h1 aria-label="Nonprofit accounting that keeps your mission fundable.">
+      <span class="ln" aria-hidden="true"><span>Nonprofit</span></span>
+      <span class="ln" aria-hidden="true"><span>accounting that</span></span>
+      <span class="ln" aria-hidden="true"><span>keeps your mission</span></span>
+      <span class="ln" aria-hidden="true"><span><em>fundable.</em></span></span>
+    </h1>
+    <p class="lede"><span>QuickBooks bookkeeping, grant tracking, and board-ready financial reporting for mission-driven organizations — so you walk into every board meeting, funder call, and audit with numbers you trust.</span></p>
+    <div class="cta-row">
+      <a class="btn email-btn" href="#contact" data-u="pinestproperties" data-d="gmail.com">Get in touch</a>
+      <a class="btn-ghost" href="#services">See services</a>
+    </div>
+
+    <p class="eyebrow packet-label"><span>What your board sees each month</span></p>
+    <div class="packet" id="packet">
+      <button class="page" data-pos="left" style="animation-delay:.35s" aria-label="Bring the grant schedule to the front">
+        <h3>Grant Schedule</h3>
+        <span class="meta">Active awards · as of March 31</span>
+        <table>
+          <tr><th>Grant</th><th>Award</th><th>Spent</th><th>Left</th></tr>
+          <tr><td>Youth program</td><td>50,000</td><td>31,200</td><td>18,800</td></tr>
+          <tr><td>Workshops</td><td>120,000</td><td>54,000</td><td>66,000</td></tr>
+          <tr><td>General ops <span class="flag">91% spent</span></td><td>75,000</td><td>68,250</td><td>6,750</td></tr>
+          <tr><td>After-school</td><td>210,000</td><td>37,150</td><td>172,850</td></tr>
+          <tr class="tot"><td>Total restricted</td><td>455,000</td><td>190,600</td><td>264,400</td></tr>
+        </table>
+      </button>
+      <button class="page" data-pos="right" style="animation-delay:.5s" aria-label="Bring the statement of financial position to the front">
+        <h3>Statement of Financial Position</h3>
+        <span class="meta">Sample organization · As of March 31</span>
+        <table class="qb">
+          <tr><th>&nbsp;</th><th>Total</th></tr>
+          <tr class="l0 sec"><td>ASSETS</td><td></td></tr>
+          <tr class="l1"><td>Current Assets</td><td></td></tr>
+          <tr class="l2"><td>Bank Accounts</td><td></td></tr>
+          <tr class="l3"><td>10100 Operating Checking</td><td>96,400</td></tr>
+          <tr class="l3"><td>10200 Savings</td><td>316,200</td></tr>
+          <tr class="l2 tot"><td>Total Bank Accounts</td><td>412,600</td></tr>
+          <tr class="l2"><td>Accounts Receivable</td><td></td></tr>
+          <tr class="l3"><td>11000 Grants Receivable</td><td>85,000</td></tr>
+          <tr class="l2 tot"><td>Total Accounts Receivable</td><td>85,000</td></tr>
+          <tr class="l2"><td>Other Current Assets</td><td></td></tr>
+          <tr class="l3"><td>12000 Prepaid Expenses</td><td>6,100</td></tr>
+          <tr class="l2 tot"><td>Total Other Current Assets</td><td>6,100</td></tr>
+          <tr class="l1 tot"><td>Total Current Assets</td><td>503,700</td></tr>
+          <tr class="l1"><td>Fixed Assets</td><td></td></tr>
+          <tr class="l2"><td>15000 Equipment</td><td>21,400</td></tr>
+          <tr class="l2"><td>15900 Accumulated Depreciation</td><td>-13,200</td></tr>
+          <tr class="l1 tot"><td>Total Fixed Assets</td><td>8,200</td></tr>
+          <tr class="l0 grand"><td>TOTAL ASSETS</td><td>511,900</td></tr>
+          <tr class="l0 sec"><td>LIABILITIES AND EQUITY</td><td></td></tr>
+          <tr class="l1"><td>Liabilities</td><td></td></tr>
+          <tr class="l2"><td>Current Liabilities</td><td></td></tr>
+          <tr class="l3"><td>20000 Accounts Payable</td><td>14,900</td></tr>
+          <tr class="l3"><td>21000 Credit Card</td><td>7,500</td></tr>
+          <tr class="l3"><td>22000 Accrued Payroll</td><td>18,600</td></tr>
+          <tr class="l2 tot"><td>Total Current Liabilities</td><td>41,000</td></tr>
+          <tr class="l1 tot"><td>Total Liabilities</td><td>41,000</td></tr>
+          <tr class="l1"><td>Equity</td><td></td></tr>
+          <tr class="l2"><td>30000 Without Donor Restrictions</td><td>118,800</td></tr>
+          <tr class="l2"><td>31000 With Donor Restrictions</td><td>230,000</td></tr>
+          <tr class="l2"><td>Net Income</td><td>122,100</td></tr>
+          <tr class="l1 tot"><td>Total Equity</td><td>470,900</td></tr>
+          <tr class="l0 grand"><td>TOTAL LIABILITIES AND EQUITY</td><td>511,900</td></tr>
+        </table>
+      </button>
+      <button class="page feature" data-pos="front" style="animation-delay:.2s" aria-label="Statement of financial activities by class: fundraising, management and general, and program services">
+        <h3>Statement of Financial Activities</h3>
+        <span class="meta">Sample organization · July – March (YTD)</span>
+        <table class="qb soa">
+          <tr><th>&nbsp;</th><th>Fundraising</th><th>Management &amp; General</th><th>Program Services</th><th>Total</th></tr>
+          <tr class="l0 sec"><td>Income</td><td></td><td></td><td></td><td></td></tr>
+          <tr class="l1"><td>40000 Grants</td><td></td><td></td><td></td><td></td></tr>
+          <tr class="l2"><td>40100 Foundation Grants</td><td></td><td></td><td>310,000</td><td>310,000</td></tr>
+          <tr class="l2"><td>40200 Government Grants</td><td></td><td></td><td>96,000</td><td>96,000</td></tr>
+          <tr class="l1 tot"><td>Total 40000 Grants</td><td>0</td><td>0</td><td>406,000</td><td>406,000</td></tr>
+          <tr class="l1"><td>41000 Contributions</td><td>52,300</td><td></td><td></td><td>52,300</td></tr>
+          <tr class="l1"><td>42000 Program Income</td><td></td><td></td><td>42,600</td><td>42,600</td></tr>
+          <tr class="l0 tot"><td>Total Income</td><td>52,300</td><td>0</td><td>448,600</td><td>500,900</td></tr>
+          <tr class="l0 tot"><td>Gross Profit</td><td>52,300</td><td>0</td><td>448,600</td><td>500,900</td></tr>
+          <tr class="l0 sec"><td>Expenses</td><td></td><td></td><td></td><td></td></tr>
+          <tr class="l1"><td>60000 Payroll Expenses</td><td></td><td></td><td></td><td></td></tr>
+          <tr class="l2"><td>60100 Salary and Wages</td><td>19,800</td><td>30,400</td><td>192,300</td><td>242,500</td></tr>
+          <tr class="l2"><td>60200 Taxes and Benefits</td><td>3,600</td><td>5,500</td><td>34,900</td><td>44,000</td></tr>
+          <tr class="l1 tot"><td>Total 60000 Payroll Expenses</td><td>23,400</td><td>35,900</td><td>227,200</td><td>286,500</td></tr>
+          <tr class="l1"><td>61000 Contract Services</td><td>2,500</td><td>9,200</td><td>21,800</td><td>33,500</td></tr>
+          <tr class="l1"><td>62000 Rent and Utilities</td><td>1,400</td><td>3,300</td><td>22,300</td><td>27,000</td></tr>
+          <tr class="l1"><td>63000 Program Supplies</td><td></td><td></td><td>24,600</td><td>24,600</td></tr>
+          <tr class="l1"><td>64000 Insurance, Fees &amp; Other</td><td>1,600</td><td>2,800</td><td>2,800</td><td>7,200</td></tr>
+          <tr class="l0 tot"><td>Total Expenses</td><td>28,900</td><td>51,200</td><td>298,700</td><td>378,800</td></tr>
+          <tr class="l0 tot"><td>Net Operating Income</td><td>23,400</td><td>-51,200</td><td>149,900</td><td>122,100</td></tr>
+          <tr class="l0 grand"><td>Net Income</td><td>23,400</td><td>-51,200</td><td>149,900</td><td>122,100</td></tr>
+        </table>
+        <span class="split" aria-hidden="true"><i class="k1" style="width:78.9%"></i><i class="k2" style="width:13.5%"></i><i class="k3" style="width:7.6%"></i></span>
+        <span class="split-legend"><b><i class="key k1"></i>Program services 78.9%</b> <b><i class="key k2"></i>Management &amp; general 13.5%</b> <b><i class="key k3"></i>Fundraising 7.6%</b></span>
+      </button>
+    </div>
+    <p class="packet-note"><span>Sample reports with illustrative figures · click or swipe to see each page</span></p>
+  </div>
+</div>
+
+<div class="trust">
+  <div class="wrap trust-inner">
+    <div class="trust-item"><strong>15+ years</strong> in accounting</div>
+    <div class="trust-item"><strong>QuickBooks</strong> specialist</div>
+    <div class="trust-item"><strong>Nonprofits</strong> exclusively</div>
+    <div class="trust-item"><strong>Detroit</strong> Michigan</div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap familiar">
+    <div>
+      <p class="eyebrow">Where most organizations start</p>
+      <h2 class="big-h reveal">Does any of this sound <em>familiar?</em></h2>
+    </div>
+    <div>
+      <ul class="notes">
+        <li class="reveal"><span class="x"><svg viewBox="0 0 30 30" aria-hidden="true"><path d="M5 16 l7 8 L27 4"/></svg></span>The board packet goes out late, or without financials.</li>
+        <li class="reveal"><span class="x"><svg viewBox="0 0 30 30" aria-hidden="true"><path d="M5 16 l7 8 L27 4"/></svg></span>Grant balances live in a spreadsheet next to QuickBooks, not in it.</li>
+        <li class="reveal"><span class="x"><svg viewBox="0 0 30 30" aria-hidden="true"><path d="M5 16 l7 8 L27 4"/></svg></span>Board members ask questions the reports should have already answered.</li>
+        <li class="reveal"><span class="x"><svg viewBox="0 0 30 30" aria-hidden="true"><path d="M5 16 l7 8 L27 4"/></svg></span>Your bookkeeper left, and what they knew left with them.</li>
+        <li class="reveal"><span class="x"><svg viewBox="0 0 30 30" aria-hidden="true"><path d="M5 16 l7 8 L27 4"/></svg></span>You've grown into your first audit, and the books weren't built for one.</li>
+      </ul>
+      <p class="notes-end reveal">None of these mean something is wrong with your organization. They mean the books were set up for a business, not a nonprofit. <strong>That's the part I fix.</strong></p>
+    </div>
+  </div>
+</section>
+
+<section class="services" id="services">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">Services</p>
+      <h2>From monthly books to <em>audit season.</em></h2>
+      <p>Ongoing monthly support or a one-time cleanup — every engagement is built around how nonprofits are actually funded and audited.</p>
+    </div>
+    <div class="lines">
+      <div class="line reveal"><span class="no">1</span><h3>Monthly bookkeeping</h3><p>Transactions categorized, accounts reconciled, and a reliable monthly close in QuickBooks — so your numbers are always current, not a year-end scramble.</p></div>
+      <div class="line reveal"><span class="no">2</span><h3>Grant tracking &amp; restricted funds</h3><p>Know exactly what each grant has funded, what remains, and what's restricted — before your funder asks, not after.</p></div>
+      <div class="line reveal"><span class="no">3</span><h3>Board-ready financial statements</h3><p>Statements of financial position and activities your board can actually read, delivered on a schedule they can count on.</p></div>
+      <div class="line reveal"><span class="no">4</span><h3>Functional expense allocation</h3><p>Program, management, and fundraising costs allocated cleanly and consistently — the way your Form 990 and your funders expect to see them.</p></div>
+      <div class="line reveal"><span class="no">5</span><h3>Audit &amp; Form 990 support</h3><p>Organized schedules and clean workpapers that make your auditor's job easier.</p></div>
+      <div class="line reveal"><span class="no">6</span><h3>QuickBooks setup &amp; cleanup</h3><p>A chart of accounts designed for fund accounting from day one — or a careful rescue for books that have drifted off course.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="why" id="why">
+  <div class="wrap">
+    <p class="eyebrow">Why a nonprofit specialist</p>
+    <h2 class="reveal">Nonprofit books aren't <em>small-business</em> books.</h2>
+    <div class="why-cols">
+      <div class="reveal">
+        <p>A generalist bookkeeper can categorize your expenses. But nonprofits answer to boards, funders, and auditors — and each expects your numbers in a specific shape.</p>
+        <p><strong>Restricted funds have to stay restricted</strong> in your books, not just in your head. When a funder gives you $50,000 for one program, your accounting has to prove that's where it went.</p>
+        <p><strong>Grant reports have deadlines.</strong> Tracked correctly in QuickBooks, they take minutes.</p>
+        <p><strong>Audits reward preparation.</strong> Clean, consistent, well-documented books make audits shorter, cheaper, and far less stressful — for you and your staff.</p>
+      </div>
+      <div class="quiz reveal">
+        <h3>You should be able to answer these in five minutes:</h3>
+        <ul>
+          <li>How much of our cash is actually unrestricted?</li>
+          <li>How much is left to spend on each active grant?</li>
+          <li>What did Program A truly cost last quarter?</li>
+          <li>Could we hand our auditor clean books tomorrow?</li>
+        </ul>
+        <p class="quiz-note">If any of these takes longer than five minutes, we should talk.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap about-cols">
+    <div class="about-text reveal">
+      <p class="eyebrow">About</p>
+      <h2 class="big-h">Hi, I'm <em>David.</em></h2>
+      <p class="first">I've spent more than 15 years in accounting, and I work exclusively with nonprofits because it's where good books matter most.</p>
+      <p>When your financials are clean, everything downstream gets easier: grant applications, board meetings, audits, and the quiet confidence of knowing exactly where your organization stands.</p>
+      <p>I keep my client list small on purpose. You work directly with me — not a rotating team — and I learn your programs, your funders, and your fiscal year well enough to anticipate what you'll need before you ask.</p>
+      <p>Everything happens remotely through QuickBooks Online, so you don't need to be near Detroit to work with me — though many of my clients are.</p>
+    </div>
+    <div class="portrait reveal">
+      <div class="d" aria-hidden="true">D</div>
+      <p>QuickBooks ProAdvisor</p>
+      <img src="Elite-digital-badge-image-920x675.png" alt="Intuit QuickBooks ProAdvisor Program — Elite tier" width="170" height="125">
+    </div>
+  </div>
+</section>
+
+<section class="process" id="process">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">How it works</p>
+      <h2>Working together, in three steps.</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal"><div class="n">1</div><h3>Intro call</h3><p>A free conversation about your organization, your funding, and where your books stand today. No pressure, no jargon.</p></div>
+      <div class="step reveal"><div class="n">2</div><h3>Books review</h3><p>I look under the hood of your QuickBooks file and give you an honest assessment — what's solid, what needs attention, and what it would take to fix.</p></div>
+      <div class="step reveal"><div class="n">3</div><h3>A monthly rhythm</h3><p>Bookkeeping handled, reports delivered on schedule, and a standing check-in — so your finances become the most predictable part of your month.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="contact" id="contact">
+  <div class="wrap reveal">
+    <p class="eyebrow">Get in touch</p>
+    <h2>Let's look at <em>your books.</em></h2>
+    <p class="sub">The first call is free. Tell me a little about your organization, and we'll figure out whether we're a fit.</p>
+    <a class="btn email-btn" href="#contact" data-u="pinestproperties" data-d="gmail.com">Email me</a>
+    <p class="where">Detroit, MI</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span class="brand">Mission <em>Ledger</em></span>
+    <span>© 2026 Mission Ledger · Nonprofit accounting &amp; grant tracking · Detroit, MI</span>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    document.documentElement.classList.add("js");
+    var subject = "?subject=" + encodeURIComponent("Nonprofit accounting inquiry");
+    document.querySelectorAll(".email-btn").forEach(function (a) {
+      a.href = "mailto:" + a.getAttribute("data-u") + "@" + a.getAttribute("data-d") + subject;
+    });
+
+    // click a side page to swap it with the front page
+    var pages = [].slice.call(document.querySelectorAll(".page"));
+    pages.forEach(function (p) {
+      p.addEventListener("click", function () {
+        var pos = p.getAttribute("data-pos");
+        if (pos === "front") return;
+        var front = document.querySelector('.page[data-pos="front"]');
+        front.setAttribute("data-pos", pos);
+        p.setAttribute("data-pos", "front");
+      });
+    });
+
+    var targets = document.querySelectorAll(".reveal");
+    if (!("IntersectionObserver" in window)) { targets.forEach(function (el) { el.classList.add("in"); }); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, { threshold: 0.2 });
+    targets.forEach(function (el) { io.observe(el); });
+  })();
+</script>
+</body>
+</html>
